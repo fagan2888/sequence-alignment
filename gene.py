@@ -58,13 +58,13 @@ class SequenceAlign:
                     else:
                         print("cell inside")
                         # A - Diagonal
-                        if (self.s1[row_index] == self.s2[row_index]):
-                            print(self.s1[row_index], " == ", self.s2[row_index])
+                        if (self.s1[row_index] == self.s2[col_index]):
+                            print(self.s1[row_index], " == ", self.s2[col_index])
                             print('Cell ', (row_index-1,col_index-1) , self.table[row_index-1][col_index-1]['total_score'])
                             a_totalscore = self.table[row_index-1][col_index-1]['total_score'] + 1
                             el['score'] = 1
                         else:
-                            print(self.s1[row_index], " != ", self.s2[row_index])
+                            print(self.s1[row_index], " != ", self.s2[col_index])
                             print('Cell ', (row_index-1,col_index-1) , self.table[row_index-1][col_index-1]['total_score'])
                             a_totalscore = self.table[row_index-1][col_index-1]['total_score'] - 1
                             print(self.table[row_index-1][col_index-1]['total_score'], ' -1 = ', a_totalscore)
@@ -109,7 +109,6 @@ class SequenceAlign:
         # print(self.table)
         first_line = self.s2.copy()
         first_line.insert(0, ' ')
-        # first_line.insert(1, '-')
         print(' '.join(first_line))
         i = 0
         for row in self.table:
@@ -120,8 +119,7 @@ class SequenceAlign:
             print(' '.join(line))
             i += 1
 
-
-seq1 = "AGCTAG"
-seq2 = "TAGCTAG"
+seq1 = "ACT"
+seq2 = "GTAA"
 dna = SequenceAlign(seq1, seq2)
 dna.align()
