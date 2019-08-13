@@ -25,12 +25,6 @@ class SequenceAlign:
     table : list = []
     tree : Node
     results : list = []
-    # blank_cell : dict = {
-    #     "total_score" : 0,
-    #     "score" : 0,
-    #     "parents" : [],
-    #     "type" : None  # start, s1Gap, s2Gap, match, mismatch
-    # }
 
     def __init__(self, s1, s2):
         # Takes input as 2 strings, convert them into instance variables x and y
@@ -151,6 +145,7 @@ class SequenceAlign:
 
     def traverse_tree(self, node, state, first_iteration):
         print("\ninteration coord: ", node.coord)
+        print('Parent coord', state["prior_coord"])
         if (first_iteration):
             print("psych")
             print_str = 'First_Iter: '
@@ -183,24 +178,20 @@ class SequenceAlign:
         
         # Modify state        
         state['prior_coord'] = copy.deepcopy(node.coord)
-        state_complete = False
-        if (len(node.children) == 0):
-            print('coord is 0,0', node.coord)
+        if (len(node.children) > 0):
+            print_str = 'Print before rec:'
+            for child in node.children:
+                print_str += str(child.coord)
+            print (print_str)
+
+            # Recurse - for loop causing issues with rec? amount of children might be issue
+            for child in node.children:
+                self.traverse_tree(child, copy.deepcopy(state), False)
+        else:
+            print('coord is 0,0', len(node.children))
             node.children = []
-            self.results.append(state)    
-            state_complete = True
-        if (not state_complete):
-            if (len(node.children) == 1):
-                # Only one child
-                self.traverse_tree(node.children[0], state, False)
-            else:
-                print_str = 'Print before rec:'
-                for child in node.children:
-                    print_str += str(child.coord)
-                print (print_str)
-                for child in node.children:
-                    self.traverse_tree(child, copy.deepcopy(state), False)
-        return
+            self.results.append(state)
+            return
 
     def print_sequences(self):
         for seq in self.results:
@@ -232,6 +223,6 @@ bottom_left = (len(dna.table)-1,len(dna.table[0])-1)
 dna.tree = Node({"coord":(-1,-1)})
 dna.create_tree(bottom_left, dna.tree)
 dna.init_traverse_tree(dna.tree, bottom_left)
-# print(str(len(dna.results)))
+print(str(len(dna.results)))
 dna.print_sequences()
 dna.tree.print_tree()
