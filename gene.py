@@ -53,55 +53,39 @@ class SequenceAlign:
         col_index = 0
         for row in self.table:
             for el in row:
-                # get parent values in list
-                # print("\nCurrent Cell:", row_index, col_index)
+                # Get parent values in list
                 el['coord'] = (row_index, col_index)
                 if (row_index == 0 and col_index == 0):   # Case: top left cell, start cell
                     el['type'] = 'start'
                     # print("Cell in upper left")
                 else:
                     if(row_index == 0 and col_index != 0):    # Case: top row disabled. Only move is accross.
-                        # print(self.table[row_index][col_index-1]['total_score'] - 2)
                         el['total_score'] = self.table[row_index][col_index-1]['total_score'] - 2
                         el['type'] = 's2gap'
                         el['score'] = (-2)
                         el['parents'].append((row_index, col_index-1))
-                        # print('row_index == 0')
                     elif(col_index == 0 and row_index != 0):   # Case: side column disabled. Only move is down.
                         el['total_score'] = self.table[row_index-1][col_index]['total_score'] - 2
-                        # print(self.table[row_index][col_index-1]['total_score'] - 2)
                         el['type'] = 's1gap'
                         el['score'] = (-2)
                         el['parents'].append((row_index-1, col_index))
-                        # print('col_index == 0')
                     else:
-                        # print("cell inside")
                         # A - Diagonal
                         if (self.s1[row_index] == self.s2[col_index]):
-                            # print(self.s1[row_index], " == ", self.s2[col_index])
-                            # print('Cell ', (row_index-1,col_index-1) , self.table[row_index-1][col_index-1]['total_score'])
                             a_totalscore = self.table[row_index-1][col_index-1]['total_score'] + 1
                             el['score'] = 1
                         else:
-                            # print(self.s1[row_index], " != ", self.s2[col_index])
-                            # print('Cell ', (row_index-1,col_index-1) , self.table[row_index-1][col_index-1]['total_score'])
                             a_totalscore = self.table[row_index-1][col_index-1]['total_score'] - 1
-                            # print(self.table[row_index-1][col_index-1]['total_score'], ' -1 = ', a_totalscore)
                             el['score'] = (-1)
                         # B/C - Gaps
-                        # print(self.table[row_index-1][col_index]['total_score'], self.table[row_index][col_index-1]['total_score'])
                         b_totalscore = self.table[row_index-1][col_index]['total_score'] - 2  # B
                         c_totalscore = self.table[row_index][col_index-1]['total_score'] - 2  # C
 
                         values = [a_totalscore, b_totalscore, c_totalscore]    # represented in order, A -> B -> C
-
-                        # print(b_totalscore, c_totalscore)
-                        # print("Scores:", values)
                         
                         # Find max - we find the max score possible in this cell and add those parents to the element dictionary object
                         max_score = max(values)
                         val_index = [i for i, j in enumerate(values) if j == max_score]
-                        # print("Value List: ",val_index)
                         for i in val_index:
                             if (i == 0):  # A
                                 el['type'] = 'match/mismatch'
@@ -118,11 +102,9 @@ class SequenceAlign:
                                 el['score'] = (-2)
                                 el['parents'].append((row_index, col_index-1))
                 col_index += 1
-                # print(el)
                 el = None
             col_index = 0
             row_index += 1
-        # self.print_table()
 
     def create_tree(self, coord : tuple, parent_node : Node):
         data = self.table[coord[0]][coord[1]]
@@ -200,7 +182,6 @@ class SequenceAlign:
             print('\n')
     
     def print_table(self):
-        # print(self.table)
         first_line = self.s2.copy()
         first_line.insert(0, ' ')
         print(' '.join(first_line))
