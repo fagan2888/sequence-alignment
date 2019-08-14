@@ -152,8 +152,6 @@ class SequenceAlign:
             for child in node.children:
                 print_str += str(child.coord)
             print (print_str)
-            for child in node.children:
-                self.traverse_tree(child, copy.deepcopy(state), False)
         else:
             if (state["prior_coord"][0] - 1 == node.coord[0] and state["prior_coord"][1] - 1 == node.coord[1]):
                 print("diagonal state")
@@ -176,22 +174,23 @@ class SequenceAlign:
                 state['s1'].insert(0, '-')
                 state['score'].insert(0, "*")
         
-        # Modify state        
-        state['prior_coord'] = copy.deepcopy(node.coord)
-        if (len(node.children) > 0):
-            print_str = 'Print before rec:'
-            for child in node.children:
-                print_str += str(child.coord)
-            print (print_str)
+            # Modify state        
+            state['prior_coord'] = copy.deepcopy(node.coord)
+            if (len(node.children) == 0):
+                print('coord is 0,0', len(node.children))
+                node.children = []
+                self.results.append(state)
+                return
+            else:
+                print_str = 'Print before rec:'
+                for child in node.children:
+                    print_str += str(child.coord)
+                print (print_str)
 
             # Recurse - for loop causing issues with rec? amount of children might be issue
-            for child in node.children:
-                self.traverse_tree(child, copy.deepcopy(state), False)
-        else:
-            print('coord is 0,0', len(node.children))
-            node.children = []
-            self.results.append(state)
-            return
+        for child in node.children:
+            print("rec")
+            self.traverse_tree(child, copy.deepcopy(state), False)
 
     def print_sequences(self):
         for seq in self.results:
