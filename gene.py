@@ -191,11 +191,13 @@ class SequenceAlign:
             i += 1
 
 def generate_sequence(n : int):
-    s2_length = random.randint(4, n)
+    dec_val = int(n * 0.1)
+    print("dec_val",dec_val)
+    s2_length = random.randint(n-dec_val, n)
 
     options = ['A', 'C', 'T', 'G']
     s1 = ''.join(random.choice(options) for i in range(0,n))
-    s2 = ''.join(random.choice(options) for i in range(0,s2_length))
+    s2 = ''.join(random.choice(options) for i in range(0,n))
 
     return (s1, s2)
 
@@ -247,6 +249,7 @@ def run_timed_test(n : int):
             res.insert(0, iteration_n)
             res.insert(1, total_time)
             writer.writerow(res)
+            # dna.print_sequences()
             
 max_len = input("Max length to test. Will count up in intervals of 5.")
 run_timed_test(int(max_len))
