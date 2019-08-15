@@ -56,7 +56,6 @@ class SequenceAlign:
                 el['coord'] = (row_index, col_index)
                 if (row_index == 0 and col_index == 0):   # Case: top left cell, start cell
                     el['type'] = 'start'
-                    # print("Cell in upper left")
                 else:
                     if(row_index == 0 and col_index != 0):    # Case: top row disabled. Only move is accross.
                         el['total_score'] = self.table[row_index][col_index-1]['total_score'] - 2
@@ -119,65 +118,52 @@ class SequenceAlign:
                 "s1" : [],
                 "s2" : [],
                 "score" : [],
-                "prior_coord" : copy.deepcopy(bottom_left)
+                "prior_coord" : copy.deepcopy(bottom_left),
+                "total_score" : 0
             },
             True
         )
 
     def traverse_tree(self, node, state, first_iteration):
-        print("\ninteration coord: ", node.coord)
-        print('Parent coord', state["prior_coord"])
-        if (first_iteration):
-            print("psych")
-            print_str = 'First_Iter: '
-            for child in node.children:
-                print_str += str(child.coord)
-            print (print_str)
-        else:
+        if (not first_iteration):
             if (state["prior_coord"][0] - 1 == node.coord[0] and state["prior_coord"][1] - 1 == node.coord[1]):
-                print("diagonal state")
                 if (self.s1[node.coord[0] + 1] == self.s2[node.coord[1] + 1]):
                     state['score'].insert(0, "+")
+                    state['total_score'] += 1
                 else:
                     state['score'].insert(0, "-")
+                    state['total_score'] -= 1
                 state['s1'].insert(0, self.s1[node.coord[0] + 1])
                 state['s2'].insert(0, self.s2[node.coord[1] + 1])
             elif (state["prior_coord"][0] - 1 == node.coord[0] and state["prior_coord"][1] == node.coord[1]):
-                print("s2gap state")
                 # S2 Gap
                 state['s1'].insert(0, self.s1[node.coord[1] + 1])
                 state['s2'].insert(0, '-')
                 state['score'].insert(0, "*")
+                state['total_score'] -= 2
             elif (state["prior_coord"][0] == node.coord[0] and state["prior_coord"][1] - 1 == node.coord[1]):
                 # S1 Gap
-                print("s1gap state")
                 state['s2'].insert(0, self.s2[node.coord[1] + 1])
                 state['s1'].insert(0, '-')
                 state['score'].insert(0, "*")
+                state['total_score'] -= 2
         
             # Modify state        
             state['prior_coord'] = copy.deepcopy(node.coord)
             if (len(node.children) == 0):
-                print('coord is 0,0', len(node.children))
                 node.children = []
                 self.results.append(state)
                 return
-            else:
-                print_str = 'Print before rec:'
-                for child in node.children:
-                    print_str += str(child.coord)
-                print (print_str)
 
             # Recurse - for loop causing issues with rec? amount of children might be issue
         for child in node.children:
-            print("rec")
             self.traverse_tree(child, copy.deepcopy(state), False)
 
     def print_sequences(self):
         for seq in self.results:
             print(' '.join(seq['s1']))
             print(' '.join(seq['s2']))
-            print(' '.join(seq['score']))
+            print(' '.join(seq['score']), "\t", seq['total_score'])
             print('\n')
     
     def print_table(self):
@@ -193,27 +179,24 @@ class SequenceAlign:
             print(' '.join(line))
             i += 1
 
-    def generate_sequence(self, n : int):
-        s2_length = random.randint(1, n)
+def generate_sequence(n : int):
+    s2_length = random.randint(1, n)
 
-        options = ['A', 'C', 'T', 'G']
-        s1 = ''.join(random.choice(options) for i in range(n))
-        s2 = ''.join(random.choice(options) for i in range(n))
+    options = ['A', 'C', 'T', 'G']
+    s1 = ''.join(random.choice(options) for i in range(n))
+    s2 = ''.join(random.choice(options) for i in range(n))
 
-        return (s1, s2)
+    return (s1, s2)
 
 
 
-seq = dna.generate_sequence(5)
+seq = generate_sequence(100)
 seq1 = seq[0]
 seq2 = seq[1]
 dna = SequenceAlign(seq1, seq2)
 dna.align()
-dna.print_table()
 bottom_left = (len(dna.table)-1,len(dna.table[0])-1)
 dna.tree = Node({"coord":(-1,-1)})
 dna.create_tree(bottom_left, dna.tree)
 dna.init_traverse_tree(dna.tree, bottom_left)
 dna.print_sequences()
-dna.tree.print_tree()
-dna.generate_sequence(5)
