@@ -252,4 +252,14 @@ def run_timed_test(n : int):
             # dna.print_sequences()
             
 max_len = input("Max length to test. Will count up in intervals of 5.")
-run_timed_test(int(max_len))
+# run_timed_test(int(max_len))
+
+# Testing
+seq = generate_sequence(22)
+dna = SequenceAlign(seq[0], seq[1])
+dna.align()
+dna.tree = Node({"coord":(-1,-1)})
+bottom_left = (len(dna.table)-1,len(dna.table[0])-1)
+dna.create_tree(bottom_left, dna.tree)
+dna.init_traverse_tree(dna.tree, bottom_left)
+dna.print_sequences()
