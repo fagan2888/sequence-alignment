@@ -1,6 +1,7 @@
 import copy
 import random
 import csv
+import os
 
 class Node:
     coord : tuple
@@ -201,7 +202,7 @@ def generate_sequence(n : int):
 def run_timed_test(n : int):
     import time
     import gc
-    with open('/Users/brice/Desktop/Classes/COMP361/Assignment2/sequence-alignment/results.csv', 'w') as results:
+    with open('/home/wilbanbric/Desktop/COMP/sequence-alignment/results.csv', 'w') as results:
         writer = csv.writer(results)
         writer.writerow(["Results"])
         writer.writerow(["length", "Time (Seconds)", "Number of Trees", "Score"])
@@ -211,9 +212,19 @@ def run_timed_test(n : int):
             seq = generate_sequence(i*5)
             inst = SequenceAlign(seq[0], seq[1])
             sequences.append(inst)
-            
+        
+        # loading bar
+        loading_bar = ['-'] * int(n+1)
+        loading_bar[0] = '@'
+
         for index, dna in enumerate(sequences):
             iteration_n = index+1 * 5
+
+            # Loading Bar
+            print(n)
+            loading_bar[index+1] = '@'
+            os.system('clear')
+            print (''.join(map(str, loading_bar)))
 
             #Time and generate seq
             start_time = time.time()
