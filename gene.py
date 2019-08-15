@@ -1,4 +1,5 @@
 import copy
+import random
 
 class Node:
     coord : tuple
@@ -45,8 +46,6 @@ class SequenceAlign:
                 el["parents"] = []
                 el["type"] = None
             self.table.append(row)
-        # print(self.table)
-        # self.print_table()
     
     def align(self):
         row_index = 0
@@ -194,8 +193,20 @@ class SequenceAlign:
             print(' '.join(line))
             i += 1
 
-seq1 = "ACT"
-seq2 = "GTAA"
+    def generate_sequence(self, n : int):
+        s2_length = random.randint(1, n)
+
+        options = ['A', 'C', 'T', 'G']
+        s1 = ''.join(random.choice(options) for i in range(n))
+        s2 = ''.join(random.choice(options) for i in range(n))
+
+        return (s1, s2)
+
+
+
+seq = dna.generate_sequence(5)
+seq1 = seq[0]
+seq2 = seq[1]
 dna = SequenceAlign(seq1, seq2)
 dna.align()
 dna.print_table()
@@ -203,6 +214,6 @@ bottom_left = (len(dna.table)-1,len(dna.table[0])-1)
 dna.tree = Node({"coord":(-1,-1)})
 dna.create_tree(bottom_left, dna.tree)
 dna.init_traverse_tree(dna.tree, bottom_left)
-print(str(len(dna.results)))
 dna.print_sequences()
 dna.tree.print_tree()
+dna.generate_sequence(5)
