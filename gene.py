@@ -1,5 +1,6 @@
 import copy
 import random
+import csv
 
 class Node:
     coord : tuple
@@ -21,24 +22,29 @@ class Node:
             child.print_tree()
 
 class SequenceAlign:
-    s1 : list = []
-    s2 : list = []
-    table : list = []
-    tree : Node
-    results : list = []
+    # s1 : list = []
+    # s2 : list = []
+    # table : list = []
+    # tree : Node
+    # results : list = []
 
     def __init__(self, s1, s2):
         # Takes input as 2 strings, convert them into instance variables x and y
+        self.s1 = []
+        self.s2 = []
+        self.table = []
+        self.results = []
+        self.tree = None
         self.s1.append('-')
         self.s2.append('-')
         for el in s1:
             self.s1.append(el)
         for el in s2:
             self.s2.append(el)
-
+            
         # Init table
-        for i in range(0, len(self.s1)):
-            row = [{} for j in range((len(self.s2)))]
+        for i in range(0, len(self.s1)-1):
+            row = [{} for j in range(0, len(self.s2))]
             for el in row:
                 el['coord'] = (0,0)
                 el["total_score"] = 0
@@ -46,12 +52,12 @@ class SequenceAlign:
                 el["parents"] = []
                 el["type"] = None
             self.table.append(row)
-    
+
     def align(self):
         row_index = 0
         col_index = 0
         for row in self.table:
-            for el in row:
+            for col_index, el in enumerate(row):
                 # Get parent values in list
                 el['coord'] = (row_index, col_index)
                 if (row_index == 0 and col_index == 0):   # Case: top left cell, start cell
@@ -99,7 +105,6 @@ class SequenceAlign:
                                 el['total_score'] = values[i]
                                 el['score'] = (-2)
                                 el['parents'].append((row_index, col_index-1))
-                col_index += 1
                 el = None
             col_index = 0
             row_index += 1
@@ -167,6 +172,10 @@ class SequenceAlign:
             print(' '.join(seq['score']), "\t", seq['total_score'])
             print('\n')
     
+    def return_results(self):
+        results_list = [self.results[0]['total_score'], len(self.results)]
+        return results_list
+    
     def print_table(self):
         first_line = self.s2.copy()
         first_line.insert(0, ' ')
@@ -181,26 +190,52 @@ class SequenceAlign:
             i += 1
 
 def generate_sequence(n : int):
-    s2_length = random.randint(1, n)
+    s2_length = random.randint(4, n)
 
     options = ['A', 'C', 'T', 'G']
-    s1 = ''.join(random.choice(options) for i in range(n))
-    s2 = ''.join(random.choice(options) for i in range(n))
+    s1 = ''.join(random.choice(options) for i in range(0,n))
+    s2 = ''.join(random.choice(options) for i in range(0,s2_length))
 
     return (s1, s2)
 
+def run_timed_test(n : int):
+    import time
+    import gc
+    with open('/Users/brice/Desktop/Classes/COMP361/Assignment2/sequence-alignment/results.csv', 'w') as results:
+        writer = csv.writer(results)
+        writer.writerow(["Results"])
+        writer.writerow(["length", "Time (Seconds)", "Number of Trees", "Score"])
 
+        sequences = []
+        for i in range(1, n+1):
+            seq = generate_sequence(i*5)
+            inst = SequenceAlign(seq[0], seq[1])
+            sequences.append(inst)
+            
+        for index, dna in enumerate(sequences):
+            iteration_n = index+1 * 5
 
-seq = generate_sequence(200)
-# seq2 = "GATCGGCAT"
-# seq1 = "CAATGTGAATC"
-print(seq[0], seq[1])
-seq1 = seq[0]
-seq2 = seq[1]
-dna = SequenceAlign(seq1, seq2)
-dna.align()
-bottom_left = (len(dna.table)-1,len(dna.table[0])-1)
-dna.tree = Node({"coord":(-1,-1)})
-dna.create_tree(bottom_left, dna.tree)
-dna.init_traverse_tree(dna.tree, bottom_left)
-dna.print_sequences()
+            #Time and generate seq
+            start_time = time.time()
+
+            # Align in Table
+            dna.align()
+            
+            # Find Sequences
+            dna.tree = Node({"coord":(-1,-1)})
+            bottom_left = (len(dna.table)-1,len(dna.table[0])-1)
+            dna.create_tree(bottom_left, dna.tree)
+            dna.init_traverse_tree(dna.tree, bottom_left)
+            
+            #End
+            end_time = time.time()
+            total_time = end_time - start_time
+            print(total_time)
+            res = dna.return_results()
+
+            res.insert(0, iteration_n)
+            res.insert(1, total_time)
+            writer.writerow(res)
+            
+max_len = input("Max length to test. Will count up in intervals of 5.")
+run_timed_test(int(max_len))
