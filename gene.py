@@ -137,7 +137,8 @@ class SequenceAlign:
                 state['s2'].insert(0, self.s2[node.coord[1] + 1])
             elif (state["prior_coord"][0] - 1 == node.coord[0] and state["prior_coord"][1] == node.coord[1]):
                 # S2 Gap
-                state['s1'].insert(0, self.s1[node.coord[1] + 1])
+            
+                state['s1'].insert(0, self.s1[node.coord[0] + 1])
                 state['s2'].insert(0, '-')
                 state['score'].insert(0, "*")
                 state['total_score'] -= 2
@@ -190,7 +191,10 @@ def generate_sequence(n : int):
 
 
 
-seq = generate_sequence(100)
+seq = generate_sequence(200)
+# seq2 = "GATCGGCAT"
+# seq1 = "CAATGTGAATC"
+print(seq[0], seq[1])
 seq1 = seq[0]
 seq2 = seq[1]
 dna = SequenceAlign(seq1, seq2)
