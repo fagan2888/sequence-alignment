@@ -4,9 +4,6 @@ import csv
 import os
 
 class Node:
-    coord : tuple
-    children : list
-
     def __init__(self, data):
         self.coord = data['coord']
         self.children = []
@@ -251,11 +248,11 @@ def run_timed_test(n : int):
             writer.writerow(res)
             # dna.print_sequences()
             
-max_len = input("Max length to test. Will count up in intervals of 5.")
+# max_len = input("Max length to test. Will count up in intervals of 5.")
 # run_timed_test(int(max_len))
 
 # Testing
-seq = generate_sequence(22)
+seq = generate_sequence(90)
 dna = SequenceAlign(seq[0], seq[1])
 dna.align()
 dna.tree = Node({"coord":(-1,-1)})
@@ -263,3 +260,4 @@ bottom_left = (len(dna.table)-1,len(dna.table[0])-1)
 dna.create_tree(bottom_left, dna.tree)
 dna.init_traverse_tree(dna.tree, bottom_left)
 dna.print_sequences()
+print(dna.return_results())
